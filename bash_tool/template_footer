@@ -1,0 +1,30 @@
+- Samstag & Sonntag
+  - Wochenende
+/
+/
+
+<h1></h1>
+
+
+
+<br>
+<br>
+<br>
+<center><small><b>Durch die nachfolgende Unterschrift, wird die Richtigkeit und Vollständigkeit der obigen Angaben bestätigt.</b></small></center>
+<div class="float-container">
+  <div class="float-child">
+  <div class="signature" style="width:200px"><hr/>Datum, Unterschrift Auszubildende/r</div>
+  \noindent\rule{2cm}{0.4pt}
+  </div>
+  <div class="float-child">
+  <div class="signature" style="width:200px"><hr/>Datum, Unterschrift Ausbildende/r oder Ausbilder/in</div>
+  \noindent\rule{2cm}{0.4pt}
+  </div>
+</div>
+
+<div class="float-container">
+  <div class="float-child">
+  <div class="signature" style="width:200px"><hr/>Datum, Unterschrift gesetzliche/r Vertreter/in</div>
+  \noindent\rule{2cm}{0.4pt}
+  </div>
+</div>

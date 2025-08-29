@@ -1,0 +1,16 @@
+<script>
+
+  // Define the variables
+  var var_button_name = "Link";
+  var var_button_link = "";
+</script>
+
+<div style="text-align: center;">
+  <button 
+    onclick="window.location.href=var_button_link"
+    style="display: inline-block; padding: 10px 20px; font-size: 20px; font-weight: bold; color: white; background-color:  #002d3c; text-align: center; text-decoration: none; border: none; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.3s ease;"
+    onmouseover="this.style.backgroundColor='#e65c00';"
+    onmouseout="this.style.backgroundColor='#ff6600';">
+    <script>document.write(var_button_name);</script>
+  </button>
+</div>

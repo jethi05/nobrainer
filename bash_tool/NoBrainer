@@ -1,0 +1,310 @@
+#!/usr/local/bin/bash
+
+# das set -e dann exit code != 0
+set -e
+# Jeremia Geisler
+# Science and Computing
+#######################
+# Dieses Programm baut auf Nico Steinles Timy auf um die Wochenberichte für
+# Rmd Datein noch einfach macht!
+
+# Verbose Mode wird hinzugefügt
+VERBOSE=false
+JAHRESURLAUB=false
+LINK_BUTTON=false
+WB_SCHREIBEN=false
+WOCHEN_UEBERSICHT=false
+TIMY=false
+FULL_FEHLENDE_BERICHTE=flase
+
+log() {
+    if [ "$VERBOSE" = true ]; then
+        GREEN='\033[0;32m'
+        RESET='\033[0m'
+        echo -e "${GREEN}[INFO]${RESET} $1"
+    fi
+}
+# genutze Funktionen:
+wb_helper() {
+    log "wb_helper wird ausgeführt"
+    echo "    _   _  _  _          _  _"
+    echo "|\ | | |_||_||_| | |\ | |_ |_|"
+    echo "| \|_| |_||\ | | | | \| |_ |\ "
+    echo ""
+    echo "-v/--verbose              Verbose"
+    echo "-h/--help                 Help"
+    echo "-J                        Jahresurlaub als Thema eingetragen"
+    echo "-L/--link                 Erstellt einen HTML Button, wo ein Link hinein geschrieben werden kann"
+    echo "-f/--fehlende_berichte    zeigt Anzahl fehlender Berichte an"
+    echo "-t                        timy"
+    echo "-w                        zeigt Wochen und aktuelle Woche"
+    echo "-F                        macht -F mit -w -f -t"
+    exit 0
+}
+
+# zeigt aktuelle Woche und Woche im Jahr an
+wochen() {
+    log "wochen() aufgerufen"
+    for i in {1..55}; do
+        printf "%02d " "$i"
+        if (( i % 5 == 0 )); then
+            echo
+        fi
+    done
+
+    exit 0
+}
+
+anzahl_fehlende_berichte_anzeigen() {
+if [[ $(date -d "$last_date" +%s) -lt $(date -d "$today" +%s) ]]; then
+
+    # Differenz in Tagen berechnen
+    diff_days=$(( ( $(date -d "$today" +%s) - $(date -d "$last_date" +%s) ) / 86400 ))
+
+    # Wochen = Tage / 7, mindestens 1
+    weeks_passed=$(( diff_days / 7 ))
+    if (( diff_days % 7 > 0 )); then
+        weeks_passed=$(( weeks_passed + 1 ))
+    fi
+
+    weeks_passed=$((weeks_passed - 1))
+
+    if [ "$weeks_passed" == 0 ]; then
+        echo "Kein WB hinterher"
+    else
+        echo "Wochen hinterher: $weeks_passed"
+    fi
+
+
+
+else
+    echo "Datum ist heute oder in der Zukunft"
+fi
+    exit 0
+}
+
+
+
+# main Programm
+standart_weg="/s+c/Azubis/$USER/wochenberichte"
+#standart_weg="/home/geisler/dev/nobrainer/testing/wochenberichte"
+log "Standart_weg: $standart_weg"
+
+
+# höchste Zahl in geradigen Ordner herausfinden, später ändern
+max_number=0
+first_date=""
+last_date=""
+
+for file in $(ls "$standart_weg"/src/files/*); do
+    # ALle Files ausgeben:
+    log "Files: $file"
+    #continue -> damit wird zur nächsten file geganen
+    # Suche nummer und Daten heraus
+    if [[ "$file" == *.Rmd ]]; then
+        number=$(sed -n 's/.*Nr.\([0-9]\+\).*/\1/p' "$file")
+        if [ "$number" -gt "$max_number" ]; then
+            # max_number ist die höchste Nummer und soll weiter übermittelt werden
+            max_number=$number
+            first_date="$(sed -n 's/.*vom="\([0-9]\+\-[0-9]\+\-[0-9]\+\)-*\([^"]*\)".*/\1/p' "$file")"
+            last_date="$(sed -n 's/.*bis="\([0-9]\+\-[0-9]\+\-[0-9]\+\)\-*\([^"]*\)".*/\1/p' "$file")"
+        fi
+    fi
+done
+# maximale Nummer muss eins erhöht werden, um eine neue höchste Zahl zu haben
+# hier wird mit dem SED command die 0, wenn sie vorhanden ist weg gemacht, damit die Zahl beim + 1 rechnen keine Fehler gibt
+max_number=$(echo $max_number | sed -e 's/^0//')
+log "first_date: $first_date"
+log "last_date: $last_date"
+
+
+# neue case instanz um Optionen anzugeben
+# ein doppelpunkt hinter dem Buchstaben zeigt, dass es eine Option will
+OPTIONS=$(getopt -o vhJLftwF --long verbose,help,link,fehlende_berichte -- "$@")
+
+# Prüfen, ob getopt erfolgreich war
+if [ $? != 0 ]; then
+    echo "Fehler bei den Optionen."
+    exit 1
+fi
+
+# Option in variablen umwandeln
+
+eval set -- "$OPTIONS"
+
+# Optionen Handling
+while true; do
+    case "$1" in
+        -v | --verbose)
+            echo "Verbose Mode aktiviert."
+            VERBOSE=true
+            #WB_SCHREIBEN=true
+            shift
+            ;;
+        -h | --help)
+        # hilfe option 
+            wb_helper
+            shift
+            ;;
+        -J)
+            echo "Jahresurlaub als Titel eintragen"
+            JAHRESURLAUB=true
+            WB_SCHREIBEN=true
+            shift
+            ;;
+        -L | --link)
+            echo "Link ist aktiv"
+            LINK_BUTTON=true
+            WB_SCHREIBEN=true
+            shift
+            ;;
+        -f | --fehlende_berichte)
+            anzahl_fehlende_berichte_anzeigen
+            shift
+            ;;
+
+        -t)
+            TIMY=true
+            shift
+            ;;
+        
+        -w)
+            wochen
+            shift
+            ;;
+        -f)
+            shift
+            ;;
+
+        --)
+            shift
+            break
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+# Argumente Checken
+while [[ "$1" != "" ]]; do
+    case $1 in
+        -v | --verbose ) VERBOSE=true ;;
+    esac
+    shift
+done
+
+# wenn kein Wert ausgewählt worden ist, soll auch der WB geschrieben werden
+if [[ "$1" = "" ]]; then
+    WB_SCHREIBEN=true
+fi
+
+
+
+
+
+
+#if WB_SCHREIBEN
+if [ "$WB_SCHREIBEN" = true ]; then
+    echo WB_schreiben wurde aktiviert und ist bereit zur ausführung!
+    # hier wird die max_number + 1 gerechnet
+    max_number=$((max_number+1))
+    # danach muss nur noch die 0 wieder vorne drann gehängt werden
+    if (( max_number < 10 )); then
+        # wenn einstellig ist, füge null hinzu
+        max_number="00$max_number"
+    elif (( max_number < 100 )); then
+        # wenn die zahl zweistellig ist, füge null hinzu
+        max_number="0$max_number"
+    fi
+    # Überprüfung
+    # Abfrage des Themas
+    # Wenn ja dann lege thema fest
+    # ansonsten nenne es Thema
+
+    ## nur thema eingeben, wenn THEMA false ist?
+    if [ "$JAHRESURLAUB" = true ]; then
+        log "Thema ist Jahresurlaub"
+        thema="Jahresurlaub"
+    else
+
+        echo "Bitte gib ein Thema ein"
+        read -p ">> " thema
+        log "Thema ist $thema"
+        if [ -z "$thema" ]; then
+            thema="Thema"
+            log "Thema ist Thema"
+        fi
+    fi
+
+
+    # erstelle Datei mit neuer Wochenberichts Nummer
+    # abfragen der Termine, bzw nächste 5 Termine nehmen (Alle Termine von den nächsten 7 Tagen nehmen)
+    datei_name="${max_number}-$USER-${thema}.Rmd"
+    log "$datei_name"
+    cp "$standart_weg/src/nobrainer/template_header" "$standart_weg/src/files/$datei_name"
+
+
+
+    # die max_number muss auch in die Datei selbst geschrieben werden :)
+    sed -i "s/Ausbildungsnachweis Nr./Ausbildungsnachweis Nr.$max_number/g" "$standart_weg/src/files/$datei_name"
+
+
+    # das touch soll durch ein cp V:\s+c\Azubis\geisler\wochenberichte\src\template ersetzt werden,
+    # die Template liegt am angegeben Pfad und wird dann mt $datei_name benannt
+    first_date=$(date -d "$first_date + 7 days" "+%Y-%m-%d")
+    last_date=$(date -d "$last_date + 7 days" "+%Y-%m-%d")
+    # Jetzt muss das Datum im Ziel ersetzt werden. Dies wird mit SED gemacht, da es oneliner sind
+    sed -i "s/vom=\"[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\"/vom=\"$first_date\"/" "$standart_weg/src/files/$datei_name"
+    sed -i "s/bis=\"[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\"/bis=\"$last_date\"/" "$standart_weg/src/files/$datei_name"
+
+    # Folgende Tage werden eingetragen:
+    # Alte Tage mit Datum
+    zeitliste --csv --von $first_date --bis $last_date | timy -m >> "$standart_weg/src/files/$datei_name"
+
+    # Optionalen Link Button
+    if [ "$LINK_BUTTON" = true ]; then
+        log "Link Button wird in Datei geschrieben"
+        cat "$standart_weg/src/nobrainer/template_linkbutton" >> "$standart_weg/src/files/$datei_name"
+    fi
+
+
+
+    # jetzt muss nur noch der footer angehängt werden
+    log "footer wird angehängt"
+    cat "$standart_weg/src/nobrainer/template_footer" >> "$standart_weg/src/files/$datei_name"
+
+    # Dateiname auch in Überschrift schreiben
+    log $thema
+    sed -i "s|<h1></h1>|<h1>$thema</h1>|" "$standart_weg/src/files/$datei_name"
+
+
+    echo "Alles hat geklappt"
+    log "Weg zu Datei:"
+    echo "$standart_weg/src/files/$datei_name"
+fi
+
+
+# mit Rscript könnte die Datei dierekt hier gerändert werden... dies geht im Moment aber noch nicht, cp fragen, wie ich das hinbekomme
+
+
+# noch einen Tag eintragen? ja/Nein?
+#echo Wollen sie noch einen Tag eintragen? (y,Y,j,J/n,N)
+
+#read -p ">> " neuen_tag_eintragen
+#if ( neuen_tag_eintragen ==
+
+
+# sed command tut noch nicht, datein bekommen in der Datei selber nicht den neuen namen, wodurch datein immer wieder überschrieben werden
+
+# mit Rscript könnte die Datei dierekt hier gerändert werden... dies geht im Moment aber noch nicht, cp fragen, wie ich das hinbekomme
+
+
+# noch einen Tag eintragen? ja/Nein?
+#echo Wollen sie noch einen Tag eintragen? (y,Y,j,J/n,N)
+
+#read -p ">> " neuen_tag_eintragen
+#if ( neuen_tag_eintragen ==
+
+
+# sed command tut noch nicht, datein bekommen in der Datei selber nicht den neuen namen, wodurch datein immer wieder überschrieben werden

@@ -1,0 +1,37 @@
+---
+title: "Ausbildungsnachweis Nr."
+author: "Jeremia Geisler"
+output:
+  html_document:
+    css: ../template/style.css
+    includes:
+      in_header: ../template/logo.html
+---
+
+```{r, echo=FALSE}
+team="Azubi"
+# Gegebene Daten im ISO-Format
+vom="2024-10-07"
+bis="2024-10-13"
+
+# Umwandlung des Datumsformats ins deutsche Format
+umgewandeltes_vom <- format(as.Date(vom), "%d.%m.%Y")
+umgewandeltes_bis <- format(as.Date(bis), "%d.%m.%Y")
+```
+<div style="text-align: center;">
+  <table border="0" style="width: 50%; margin: 0 auto; border-collapse: collapse; background-color: #002d3c; border: 1px solid #002d3c; border-radius: 15px; overflow: hidden;">
+    <!-- Mittlere Zeile -->
+    <tr style="background-color: #002d3c; color: white;">
+      <td style="padding: 3px; text-align: center;">Team</td>
+      <td style="padding: 3px; text-align: center;">`r team`</td>
+      <td style="padding: 3px;"></td>
+    </tr>
+
+    <!-- Zeile unterhalb -->
+    <tr style="background-color: #002d3c; color: white;">
+      <td style="padding: 3px; text-align: center;">Ausbildungswoche</td>
+      <td style="padding: 3px; text-align: center;">Vom: `r umgewandeltes_vom`</td>
+      <td style="padding: 3px; text-align: center;">Bis: `r umgewandeltes_bis`</td>
+    </tr>
+  </table>
+</div>
