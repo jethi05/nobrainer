@@ -32,16 +32,50 @@ flowchart TB
             CD -->| wenn noch Datein in Ordner|CA
             CD -->|keine weitere Datei|D[$max_nummer anpassen 3 stellig]
     D --> DA{$Jahresurlaub==True}
-        DA -->|Nein|DAA[THema eingeben]
-            DAA --> E
+        DA -->|Nein|DAA[Thema eingeben]
+            DAA --> DAC
         DA -->|Ja|DAB[$thema==Jahresurlaub]
-            DAB --> E[$datei_name = $max_nummer-$USER-$thema.Rmd]
-            E ---> EA[Datei wird mit template_header erstellt]
+            DAB --> DAC[$datei_name = $max_nummer-$USER-$thema.Rmd]
+            DAC ---> E[Datei wird mit template_header erstellt]
                 E --> EB[$max_nummer in Datei schreiben]
                 E --> EC[$erstes_datum + 7 $letztes_datum + 7]
                 E --> ED[Datum in der Zieldatei ersetzten zu aktuellem]
                 E --> EE[zetiliste --csv]
-                E --> EF[link button einfügen wenn true]
-            EA --> F[Template_footer anhängen]
-        F
+                E --> EF{$link_button = True}
+                    EF -->|Ja|EFA[Template_link_button einfügen]
+            E ---> F[Template_footer anhängen]
+        F -->G(Stop)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```
