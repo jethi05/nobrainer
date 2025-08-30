@@ -25,3 +25,4 @@ fn main() {
 //https://www.programiz.com/rust/file-handling
 
 // Daten aus einer Datei erfolgreich in eine andere Datei gepackt...
+// daher dass target nicht getracket wird, data.txt muss in target/debug angelegt werden
