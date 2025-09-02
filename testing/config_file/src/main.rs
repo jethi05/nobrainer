@@ -1,27 +1,23 @@
-use serde::{Deserialize, Serialize};
-use serde_json::from_str;
+use std::fs::File;
+use std::io::BufReader;
+use serde::Deserialize;
 
-#[derive(Deserialize, Serialize, Debug)]
-struct Todo {
-    #[serde(rename = "userId")]
-    user_id: usize,
-    id: usize,
-    title: String,
-    completed: bool,
+#[derive(Debug, Deserialize)]
+struct Config {
+    path: String,
 }
 
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // JSON-Datei öffnen
+    let file = File::open("file.json")?;
+    let reader = BufReader::new(file);
 
-const JSON: &str = r#"
-{
-    "userId": 1,
-    "id": 2,
-    "title": "kek",
-    "completed": false
+    // Deserialisieren in struct
+    let config: Config = serde_json::from_reader(reader)?;
+
+    // Pfad verwenden
+    println!("Der eingelesene Pfad lautet: {}", config.path);
+
+    Ok(())
 }
-"#;
 
-
-fn main() {
-    let res = from_str::<Todo>(JSON);
-    println!("{:?}", res);
-}
