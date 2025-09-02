@@ -2,6 +2,8 @@ use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 
+use std::fs;
+
 fn main() {
     // Read a file in the local file System
     let mut data_file = File::open("data.txt").unwrap();
@@ -21,6 +23,13 @@ fn main() {
     data_file_cp.write(file_content.as_bytes()).expect("write failed");
 
     println!("Created and copied");
+
+    // use std::fs;
+    //let paths = fs::read_dir("./").unwrap();
+    let paths = fs::read_dir("/s+c/Azubis/geisler/wochenberichte/src/files/").unwrap();
+    for path in paths {
+        println!("Name: {}", path.unwrap().file_name().display())
+    }
 }
 //https://www.programiz.com/rust/file-handling
 
