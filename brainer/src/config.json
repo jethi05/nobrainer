@@ -1,0 +1,5 @@
+{
+  "test_var":"test/var",
+  "safe_files":"../../safe_files/",
+  "template_files":"../../bash_tool/"
+}
